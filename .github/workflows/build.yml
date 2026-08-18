@@ -8,11 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: 'macos-latest'
-            args: '--target aarch64-apple-darwin'
-          - platform: 'windows-latest'
-            args: ''
+        platform: [macos-latest, windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -32,9 +28,18 @@ jobs:
       - name: Install Node Packages
         run: npm install
 
-      - name: Build Tauri Application
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Tauri (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: npm run tauri build -- --target aarch64-apple-darwin
+
+      - name: Build Tauri (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: npm run tauri build
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          args: ${{ matrix.args }}
+          name: Forest-${{ matrix.platform }}
+          path: |
+            src-tauri/target/**/bundle/dmg/*.dmg
+            src-tauri/target/**/bundle/nsis/*.exe
