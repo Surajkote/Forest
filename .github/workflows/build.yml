@@ -32,14 +32,12 @@ jobs:
         if: matrix.platform == 'macos-latest'
         run: npm run tauri build -- --target aarch64-apple-darwin
 
+      - name: Build Tauri (macOS)
+        if: matrix.platform == 'macos-latest'
+        # Changed to force use the exact npx tauri CLI
+        run: npx @tauri-apps/cli build --target aarch64-apple-darwin
+
       - name: Build Tauri (Windows)
         if: matrix.platform == 'windows-latest'
-        run: npm run tauri build
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Forest-${{ matrix.platform }}
-          path: |
-            src-tauri/target/**/bundle/dmg/*.dmg
-            src-tauri/target/**/bundle/nsis/*.exe
+        # Changed to force use the exact npx tauri CLI
+        run: npx @tauri-apps/cli build
