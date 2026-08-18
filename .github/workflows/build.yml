@@ -11,6 +11,12 @@ jobs:
         platform: [macos-latest, windows-latest]
 
     runs-on: ${{ matrix.platform }}
+    
+    # THIS TELLS GITHUB TO STEP INSIDE YOUR FOLDER FIRST
+    defaults:
+      run:
+        working-directory: ./Forest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,14 +36,17 @@ jobs:
 
       - name: Build Tauri (macOS)
         if: matrix.platform == 'macos-latest'
-        run: npm run tauri build -- --target aarch64-apple-darwin
-
-      - name: Build Tauri (macOS)
-        if: matrix.platform == 'macos-latest'
-        # Changed to force use the exact npx tauri CLI
         run: npx @tauri-apps/cli build --target aarch64-apple-darwin
 
       - name: Build Tauri (Windows)
         if: matrix.platform == 'windows-latest'
-        # Changed to force use the exact npx tauri CLI
         run: npx @tauri-apps/cli build
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Forest-${{ matrix.platform }}
+          # UPDATED PATHS TO LOOK INSIDE THE FOREST FOLDER
+          path: |
+            Forest/src-tauri/target/**/bundle/dmg/*.dmg
+            Forest/src-tauri/target/**/bundle/nsis/*.exe
